@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Scalable Image Map</title>
+
+  <style>
+    .image-map-container {
+      width: 100%;
+      max-width: 1920px;
+      margin: 0 auto;
+    }
+
+    .image-map-container img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+
+<div class="image-map-container">
+  <img
+   src="assets/i8Sys_n_Application.png" 
+   alt="Example" 
+   usemap="#image-map" 
+   id="mapped-image"
+   >
+
+<!-- Define the clickable areas -->
+<map name="image-map">
+
+<!--Drives-->         <area shape="rect" coords="74,5,132,25" href="" target="_self">
+<!--Media-->          <area shape="rect" coords="142,5,196,25" href="" target="_self">
+<!--TunnelFurnace-->  <area shape="rect" coords="208,5,312,25" href="SlabOverview.html" target="_self"> 
+<!--RoughingMill-->   <area shape="rect" coords="328,5,424,25" href="RM-Overview.html" target="_self">
+<!--FinishingMill-->  <area shape="rect" coords="434,5,529,25" href="FM-Overview.html" target="_self">
+<!--LaminarCooling--> <area shape="rect" coords="538,5,654,25" href="LC-Overview.html" target="_self">
+<!--DownCoiler-->     <area shape="rect" coords="665,5,755,25" href="" target="_self">
+<!--System-->         <area shape="rect" coords="" href="System.html" target=_self>
+
+<!--0-->  <area shape="rect" coords="127,121,271,156" href="../System.html" target="_self">
+
+<!--1-->  <area shape="rect" coords="261,1044,384,1075" href="../System.html" alt="FM/Rectangle Area" target="_self">  
+<!--2-->  <area shape="rect" coords="391,1044,514,1075" href="Fieldbus-RM.html" alt="FM/Rectangle Area" target="_self">  
+<!--3-->  <area shape="rect" coords="521,1044,644,1075" href="Fieldbus-FM.html" alt="FM/Rectangle Area" target="_self">  
+<!--4-->  <area shape="rect" coords="651,1044,774,1075" href="Information.html" alt="FM/Rectangle Area" target="_self"> 
+<!--5-->  <area shape="rect" coords="" href="Application.html" alt="Rectangle Area" target="_self">
+<!--6-->  <area shape="rect" coords="911,1044,1034,1075" href="Node-Rights.html" alt="FM/Rectangle Area" target="_self">  
+<!--7-->  <area shape="rect" coords="1041,1044,1164,1075" href="User-Rights.html" alt="FM/Rectangle Area" target="_self"> 
+<!--8-->  <area shape="rect" coords="1171,1044,1294,1075" href="Connections.html" alt="Rectangle Area" target="_self">
+<!--9-->  <area shape="rect" coords="1301,1044,1424,1075" href="Database.html" alt="FM/Rectangle Area" target="_self">
+<!--10--> <area shape="rect" coords="1431,1044,1554,1075" href="PDL-Statistics.html" alt="FM/Rectangle Area" target="_self">
+
+
+
+</map>
+</div>
+
+<script>
+    function makeImageMapResponsive(image) {
+      const mapName = image.useMap.replace("#", "");
+      const map = document.querySelector(`map[name="${mapName}"]`);
+
+      if (!map) {
+        console.error(`Image map "${mapName}" was not found.`);
+        return;
+      }
+
+      const areas = map.querySelectorAll("area");
+
+      // Store the original coordinates.
+      areas.forEach(area => {
+        area.dataset.originalCoords = area.coords;
+      });
+
+      function resizeMap() {
+        const originalWidth = image.naturalWidth;
+        const originalHeight = image.naturalHeight;
+
+        if (!originalWidth || !originalHeight) {
+          return;
+        }
+
+        const displayedWidth = image.clientWidth;
+        const displayedHeight = image.clientHeight;
+
+        const widthRatio = displayedWidth / originalWidth;
+        const heightRatio = displayedHeight / originalHeight;
+
+        areas.forEach(area => {
+          const originalCoords = area.dataset.originalCoords
+            .split(",")
+            .map(Number);
+
+          const resizedCoords = originalCoords.map((coordinate, index) => {
+            const ratio = index % 2 === 0 ? widthRatio : heightRatio;
+            return Math.round(coordinate * ratio);
+          });
+
+          area.coords = resizedCoords.join(",");
+        });
+      }
+
+      if (image.complete) {
+        resizeMap();
+      } else {
+        image.addEventListener("load", resizeMap);
+      }
+
+      window.addEventListener("resize", resizeMap);
+
+      // Detects changes caused by container resizing.
+      const resizeObserver = new ResizeObserver(resizeMap);
+      resizeObserver.observe(image);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const image = document.getElementById("mapped-image");
+
+      if (image) {
+        makeImageMapResponsive(image);
+      }
+    });
+  </script>
+
+</body>
+</html>
